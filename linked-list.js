@@ -22,6 +22,20 @@ class LinkedList {
     for (let val of vals) this.push(val);
   }
 
+  /** _get(idx): retrieve node at idx. */
+
+  _get(idx) {
+    let cur = this.head;
+    let count = 0;
+
+    while (cur !== null && count !== idx) {
+      count += 1;
+      cur = cur.next;
+    }
+
+    return cur;
+  }
+
   /** push(val): add new value to end of list. */
 
   push(val) {
@@ -76,49 +90,133 @@ class LinkedList {
 
     if (!this.head) throw new Error("Empty list");
 
+    let pre = this.head;
+    let temp = this.head.next;
+
     if (this.length === 1) {
-      let temp = this.head;
       this.head = null;
       this.tail = null;
       this.length = 0;
-      return temp;
+      return pre.val;
     }
 
-    const currTail = this.tail.val;
-    let current = this.head;
-
-    while (current !== null) {
-      if (current.next === currTail) {
-        this.tail = current;
-        this.length--;
-        return currTail;
-      }
-      current = current.next;
+    while (temp.next !== null) {
+      pre = pre.next;
     }
+
+    pre.next = null;
+    this.tail = pre;
+    this.length--;
+    return temp.val;
+
   }
-
 
   /** shift(): return & remove first item. */
 
   shift() {
+    // temp to head var to return
+    // make head the second item
+
+
+    if (!this.head) throw new Error("Empty list");
+
+    const oldHead = this.head;
+
+    if (this.length === 1) {
+      this.head = null;
+      this.tail = null;
+      this.length = 0;
+      return oldHead.val;
+    }
+
+    this.head = this.head.next;
+    this.length--;
+
+    return oldHead.val;
+
 
   }
 
   /** getAt(idx): get val at idx. */
 
   getAt(idx) {
+    // set a counter to zero
+    // return the value at idx
+    // if index is greater than or equal length throw
+    if (idx >= this.length || idx < 0) throw new Error("Index Not Found");
+    let count = 0;
+
+    let current = this.head;
+    while (current !== null && count !== idx) {
+      count++;
+      current = current.next;
+    }
+
+    return current.val;
 
   }
 
   /** setAt(idx, val): set val at idx to val */
 
   setAt(idx, val) {
+    // set a counter to zero
+
+    // when the counter reaches the idx
+    // change value at that node
+    if (idx >= this.length || idx < 0) throw new Error("Index Not Found");
+    let current = this.head;
+    let count = 0;
+
+    while (current !== null) {
+      if (idx === count) {
+        current.val = val;
+        return;
+      }
+      count++;
+      current = current.next;
+    }
+
+
 
   }
 
   /** insertAt(idx, val): add node w/val before idx. */
 
   insertAt(idx, val) {
+    if (idx > this.length || idx < 0) throw new Error("Index Not Found");
+    // when count is at idx -1 that node needs to point at
+    // our node an out node needs to point at the next node
+
+    if (this.length === 0) {
+      const node = new Node(val);
+      this.head = node;
+      this.tail = node;
+      this.length = 1;
+      return;
+    }
+
+    if (idx === 0) {
+      this.unshift(val);
+      return;
+    }
+
+    if (idx === this.length) {
+      this.push(val);
+      return;
+    }
+
+    let pre = this.head;
+
+    for (let k = 0; k < idx - 1; k++) {
+      pre = pre.next;
+    }
+
+    let aft = pre.next;
+    let vtx = new Node(val);
+    vtx.next = aft;
+    pre.next = vtx;
+    this.length++;
+
 
   }
 
@@ -126,12 +224,55 @@ class LinkedList {
 
   removeAt(idx) {
 
+    if (idx >= this.length || idx < 0) {
+      throw new Error("Invalid index.");
+    }
+
+    // special case: remove first item
+
+    if (idx === 0) {
+      let val = this.head.val;
+      this.head = this.head.next;
+      this.length -= 1;
+      if (this.length < 2) this.tail = this.head;
+      return val;
+    }
+
+    let prev = this._get(idx - 1);
+
+    // special case: remove tail
+
+    if (idx === this.length - 1) {
+      let val = prev.next.val;
+      prev.next = null;
+      this.tail = prev;
+      this.length -= 1;
+      return val;
+    }
+
+    // normal case: remove in middle
+
+    let val = prev.next.val;
+    prev.next = prev.next.next;
+    this.length -= 1;
+    return val;
+
   }
 
-  /** average(): return an average of all values in the list */
+  /** return average (mean) of list values. */
 
   average() {
+    if (this.length === 0) return 0;
 
+    let total = 0;
+    let current = this.head;
+
+    while (current) {
+      total += current.val;
+      current = current.next;
+    }
+
+    return total / this.length;
   }
 }
 
